@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StatServiceImpl implements StatService {
+public class StatServiceImpl implements ru.practicum.service.StatService {
     private final StatRepository statRepository;
 
     @Override
