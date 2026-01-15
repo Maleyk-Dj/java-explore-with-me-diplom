@@ -1,71 +1,31 @@
-version: '3.8'
-
 services:
-  # ---------- STATS DB ----------
+
   stats-db:
     image: postgres:16.1
     container_name: stats-db
     environment:
-      POSTGRES_USER: ${STATISTICS_POSTGRES_USER:-sa}
-      POSTGRES_PASSWORD: ${STATISTICS_POSTGRES_PASSWORD:-sa}
-      POSTGRES_DB: ${STATISTICS_POSTGRES_DB:-statistics}
+      POSTGRES_DB: statistics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "${STATISTICS_POSTGRES_PORT:-5432}:5432"
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${STATISTICS_POSTGRES_USER:-sa} -d ${STATISTICS_POSTGRES_DB:-statistics}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d statistics"]
       interval: 5s
       timeout: 5s
       retries: 10
-    restart: unless-stopped
 
-  # ---------- EWM DB ----------
   ewm-db:
     image: postgres:16.1
     container_name: ewm-db
     environment:
-      POSTGRES_USER: ${EWM_POSTGRES_USER:-sa}
-      POSTGRES_PASSWORD: ${EWM_POSTGRES_PASSWORD:-sa}
-      POSTGRES_DB: ${EWM_POSTGRES_DB:-ewm}
+      POSTGRES_DB: ewm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "${EWM_POSTGRES_PORT:-5433}:5432"
+      - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${EWM_POSTGRES_USER:-sa} -d ${EWM_POSTGRES_DB:-ewm}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ewm"]
       interval: 5s
       timeout: 5s
       retries: 10
-    restart: unless-stopped
-
-  # ---------- STATS SERVER В DOCKER (РАСКОММЕНТИРОВАНО) ----------
-  stats-server:
-    build: ./statistics-service/statistics-server
-    image: statistics_service:latest
-    container_name: stats-server
-    environment:
-      SPRING_DATASOURCE_URL: ${STATISTICS_SPRING_DATASOURCE_URL:-jdbc:postgresql://stats-db:5432/statistics}
-      SPRING_DATASOURCE_USERNAME: ${STATISTICS_POSTGRES_USER:-sa}
-      SPRING_DATASOURCE_PASSWORD: ${STATISTICS_POSTGRES_PASSWORD:-sa}
-    depends_on:
-      stats-db:
-        condition: service_healthy
-    ports:
-      - "9090:9090"
-    restart: unless-stopped
-
-  # ---------- EWM SERVICE В DOCKER (РАСКОММЕНТИРОВАНО) ----------
-  ewm-service:
-    build: ./ewm-service
-    image: ewm_service:latest
-    container_name: ewm-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/${EWM_POSTGRES_DB:-ewm}
-      SPRING_DATASOURCE_USERNAME: ${EWM_POSTGRES_USER:-sa}
-      SPRING_DATASOURCE_PASSWORD: ${EWM_POSTGRES_PASSWORD:-sa}
-      STATS_SERVER_URL: http://stats-server:9090 # Должно указывать на имя сервиса статистики
-    depends_on:
-      ewm-db:
-        condition: service_healthy
-      stats-server: # Убедитесь, что EWM зависит от запущенного Stat Server
-        condition: service_started
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
