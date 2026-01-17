@@ -1,0 +1,19 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/statistics
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+

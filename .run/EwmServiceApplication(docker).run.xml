@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="EwmServiceApplication(docker)" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="ru.practicum.EwmServiceApplication" />
+    <option name="MAIN_CLASS_NAME" value="ru.practicum.EwmService" />
     <module name="ewm-service" />
     <option name="VM_PARAMETERS" value="-Dspring.profiles.active=local" />
     <method v="2">
