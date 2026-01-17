@@ -15,7 +15,7 @@ spring:
             - classpath:/config/infra
 
 server:
-  port: 0
+  port: 9090
 
 eureka:
   client:

@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/ewm
+    url: jdbc:postgresql://localhost:5432/statistics
     username: postgres
     password: postgres
 
@@ -11,12 +11,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 eureka:
   instance:
     prefer-ip-address: true
     instance-id: "${spring.application.name}:${random.value}"
+
