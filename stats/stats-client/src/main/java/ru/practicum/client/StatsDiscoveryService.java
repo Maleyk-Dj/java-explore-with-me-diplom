@@ -11,7 +11,7 @@ import ru.practicum.exception.StatsClientException;
 public class StatsDiscoveryService {
 
     private final DiscoveryClient discoveryClient;
-    private static final String STATS_SERVER_ID = "stats-server";
+    private static final String STATS_SERVER_ID = "stats-server".toUpperCase();
 
     public ServiceInstance getInstance (){
         try {
