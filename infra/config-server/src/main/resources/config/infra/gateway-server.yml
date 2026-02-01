@@ -1,6 +1,15 @@
 server:
   port: 8080
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true
+
 spring:
   cloud:
     gateway:
@@ -10,7 +19,94 @@ spring:
           lower-case-service-id: true
 
       routes:
-        - id: ewm-service-route
-          uri: lb://ewm-service
+        # Публичные endpoints
+        - id: public-events
+          uri: lb://EVENT-SERVICE
           predicates:
-            - Path=/api/**
+            - Path=/events/**
+
+        # Категории
+        - id: categories
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/categories/**
+
+        # Комментарии
+        - id: comments
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/comments/**
+
+        # Подборки
+        - id: compilations
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/compilations/**
+
+        # Админские endpoints
+        # Admin users → USER-SERVICE
+        - id: admin-users
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/admin/users/**
+
+        # Admin events & categories → EVENT-SERVICE
+        - id: admin-events
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/admin/events/**
+
+        - id: admin-categories
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/admin/categories/**
+
+        - id: admin-comments
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/admin/comments/**
+
+        - id: admin-compilations
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/admin/compilations/**
+
+
+
+        # События пользователя → EVENT-SERVICE
+        - id: user-events
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/users/*/events/**
+
+        # Requests пользователя → REQUEST-SERVICE
+        - id: user-requests
+          uri: lb://REQUEST-SERVICE
+          predicates:
+            - Path=/users/*/requests/**
+
+        - id: user-comments
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/users/*/comment/**
+
+
+
+        # Пользовательские endpoints
+        - id: user-routes
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
+
+        # Пользовательские endpoints
+        - id: request-routes
+          uri: lb://REQUEST-SERVICE
+          predicates:
+            - Path=/requests/**
+
+
+        # Статистика ← ДОБАВЬТЕ ЭТО
+        - id: stats-server
+          uri: lb://STATS-SERVER
+          predicates:
+            - Path=/stats/**

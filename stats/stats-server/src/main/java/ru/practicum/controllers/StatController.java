@@ -2,7 +2,6 @@ package ru.practicum.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,8 @@ import ru.practicum.statistics.dto.EndpointHitDto;
 import ru.practicum.statistics.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,20 +34,28 @@ public class StatController {
 
     @GetMapping("/stats")
     public Collection<ViewStatsDto> getStats(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+            @RequestParam String start,
+            @RequestParam String end,
             @RequestParam(required = false) List<String> uris,
-            @RequestParam(defaultValue = "false") boolean unique) {
+            @RequestParam(defaultValue = "false") boolean unique
+    ) {
+        LocalDateTime startTime;
+        LocalDateTime endTime;
 
-        if (start.isAfter(end)) {
-            // Spring автоматически маппирует IllegalArgumentException в 400 Bad Request
-            throw new IllegalArgumentException("Дата начала (" + start +
-                    ") не может быть позже даты окончания (" + end + ").");
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            startTime = LocalDateTime.parse(start, formatter);
+            endTime = LocalDateTime.parse(end, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Неверный формат даты");
         }
-        // Передача параметров в сервис, как обычно
-        return statService.getStats(start, end, uris, unique);
-    }
 
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Дата начала позже даты окончания");
+        }
+
+        return statService.getStats(startTime, endTime, uris, unique);
+    }
 
 }
 

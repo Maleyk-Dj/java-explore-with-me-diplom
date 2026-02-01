@@ -41,11 +41,11 @@ public class StatClient {
     public void hit(EndpointHitDto endpointHitDto) {
         URI uri = uriFactory.buildUri("/hit");
 
-            restClient.post()
-                    .uri(uri)
-                    .body(endpointHitDto)
-                    .retrieve()
-                    .toBodilessEntity();
+        restClient.post()
+                .uri(uri)
+                .body(endpointHitDto)
+                .retrieve()
+                .toBodilessEntity();
     }
 
     public List<ViewStatsDto> getStats(
@@ -70,13 +70,16 @@ public class StatClient {
                                 ? Optional.empty()
                                 : Optional.of(uris)
                 )
-                .build(false)
+                .encode()        // ✅ ВКЛЮЧАЕМ encoding
+                .build()
                 .toUri();
+
 
         return restClient.get()
                 .uri(uri)
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+                .body(new ParameterizedTypeReference<>() {
+                });
     }
 
     private void validateGetStatsParam(LocalDateTime start, LocalDateTime end) {

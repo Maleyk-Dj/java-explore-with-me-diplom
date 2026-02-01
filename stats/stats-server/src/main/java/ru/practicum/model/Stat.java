@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Stat")
+@Table(name = "stat")
 @Setter
 @Getter
 @EqualsAndHashCode(of = {"id"})

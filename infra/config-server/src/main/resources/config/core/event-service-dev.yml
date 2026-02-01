@@ -1,0 +1,48 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/event
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+stats-server:
+  url: http://stats-server
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+
+# config/event-service/event-service.yml
+logging:
+  level:
+    ru.practicum.events.client.user.UserClient: DEBUG
+    ru.practicum.events.client.request.RequestClient: DEBUG
+    ru.practicum: DEBUG
+    ru.practicum.client: DEBUG
+    ru.practicum.events.service: DEBUG  # Пакет вашего EventServiceImpl
+    ru.practicum.events.service.EventServiceImpl: TRACE
+    org.springframework.cloud.openfeign: DEBUG
+    org.springframework.web: DEBUG
+    feign: DEBUG
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL
+        connectTimeout: 5000
+        readTimeout: 5000
+  httpclient:
+    enabled: true
