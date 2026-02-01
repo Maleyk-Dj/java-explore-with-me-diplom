@@ -13,10 +13,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>user-module</module>
+        <module>user-service</module>
         <module>common-module</module>
-        <module>event-module</module>
-        <module>request-module</module>
+        <module>event-service</module>
+        <module>request-service</module>
     </modules>
 
     <dependencyManagement>
