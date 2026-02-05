@@ -28,4 +28,9 @@ public interface RequestClient {
     EventRequestStatusUpdateResult changeRequestsStatus(
             @PathVariable Long eventId,
             @RequestBody RequestStatusUpdateRequest request);
+
+    @GetMapping("/events/{eventId}/users/{userId}/visited")
+    boolean hasUserVisitedEvent(@PathVariable Long eventId,
+                                @PathVariable Long userId);
+
 }

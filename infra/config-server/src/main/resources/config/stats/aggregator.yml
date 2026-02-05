@@ -1,0 +1,21 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+aggregator:
+  kafka:
+    bootstrap-server: localhost:9092
+    key-serializer: org.apache.kafka.common.serialization.LongSerializer
+    value-serializer: ru.practicum.aggregator.serializer.AggregatorSerializer
+    topic-events-similarity: stats.events-similarity.v1
+    key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    value-deserializer: ru.practicum.aggregator.deserializer.UserActionDeserializer
+    group-id: aggregator-stats-client
+    topic-user-actions: stats.user-actions.v1
+    max-poll-records: 100
+    max-poll-intervalMs: 30000
+    fetch-max-wait-ms: 100
+    enable-auto-commit: false
+    consume-attempt-timeout: 100

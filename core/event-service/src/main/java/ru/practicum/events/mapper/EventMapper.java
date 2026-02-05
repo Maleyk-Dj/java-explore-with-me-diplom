@@ -16,13 +16,13 @@ import java.time.format.DateTimeFormatter;
 public class EventMapper {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     public EventFullDto toEventFullDto(Event event, UserShortDto initiator) {
         if (event == null) {
             return null;
         }
 
         EventFullDto dto = new EventFullDto();
+
         dto.setId(event.getId());
         dto.setAnnotation(event.getAnnotation());
 
@@ -33,7 +33,9 @@ public class EventMapper {
         dto.setCategory(categoryDto);
 
         dto.setConfirmedRequests(
-                event.getConfirmedRequests() != null ? event.getConfirmedRequests() : 0
+                event.getConfirmedRequests() != null
+                        ? event.getConfirmedRequests()
+                        : 0
         );
 
         dto.setCreatedOn(event.getCreatedOn() != null
@@ -43,7 +45,6 @@ public class EventMapper {
         dto.setDescription(event.getDescription());
         dto.setEventDate(event.getEventDate().format(formatter));
 
-        // 🔥 Вот ключевой момент
         dto.setInitiator(initiator);
 
         Location location = new Location(
@@ -54,14 +55,14 @@ public class EventMapper {
 
         dto.setPaid(event.getPaid());
         dto.setParticipantLimit(event.getParticipantLimit());
+
         dto.setPublishedOn(event.getPublishedOn() != null
                 ? event.getPublishedOn().format(formatter)
                 : null);
+
         dto.setRequestModeration(event.getRequestModeration());
         dto.setState(event.getState().name());
         dto.setTitle(event.getTitle());
-        dto.setViews(event.getViews() != null ? event.getViews() : 0);
-
         return dto;
     }
 
@@ -96,15 +97,14 @@ public class EventMapper {
 
         dto.setEventDate(event.getEventDate().format(formatter));
 
-        // 🔥 просто устанавливаем уже полученного пользователя
         dto.setInitiator(initiator);
 
         dto.setPaid(event.getPaid());
         dto.setTitle(event.getTitle());
-        dto.setViews(event.getViews() != null ? event.getViews() : 0);
 
         return dto;
     }
+
 
 
     public Event toEventForUpdate(Long userId, Long eventId, UpdateEventUserRequest request) {

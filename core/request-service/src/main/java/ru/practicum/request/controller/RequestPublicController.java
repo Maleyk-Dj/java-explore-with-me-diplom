@@ -46,4 +46,12 @@ public class RequestPublicController {
         log.info("Public endpoint: change status for event {}", eventId);
         return requestService.changeRequestsStatus(eventId, request);
     }
+
+    @GetMapping("/events/{eventId}/users/{userId}/visited")
+    public boolean hasUserVisitedEvent(@PathVariable Long eventId,
+                                       @PathVariable Long userId) {
+        log.info("Check if user {} visited event {}", userId, eventId);
+        return requestService.hasUserVisitedEvent(userId, eventId);
+    }
+
 }
