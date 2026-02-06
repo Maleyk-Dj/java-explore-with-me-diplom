@@ -3,14 +3,17 @@ spring:
     url: jdbc:postgresql://localhost:5432/analyzer?sslmode=disable
     username: postgres
     password: postgres
+
   jpa:
-    hibernate.ddl-auto: none
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         jdbc.time_zone: UTC
         format_sql: true
         default_schema: public
     show-sql: true
+
 management:
   endpoints:
     web:
@@ -35,12 +38,4 @@ analyzer:
 
 logging:
   level:
-    org.springframework:
-      orm.jpa: INFO
-      transaction: INFO
-      transaction.interceptor: TRACE
-      orm.jpa.JpaTransactionManager: DEBUG
-      ru.practicum.analyzer: DEBUG
-      org.springframework.context: INFO
-      org.springframework.beans: INFO
-      org.springframework.boot.autoconfigure: DEBUG
+    ru.practicum.analyzer: DEBUG
