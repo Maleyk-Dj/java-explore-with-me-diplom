@@ -25,6 +25,7 @@ import ru.practicum.request.storage.RequestRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -255,6 +256,5 @@ public class RequestServiceImpl implements RequestService {
                 RequestStatus.CONFIRMED
         );
     }
-
 
 }
