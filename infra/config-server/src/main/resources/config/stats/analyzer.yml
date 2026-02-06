@@ -1,9 +1,6 @@
-server:
-  port: 0
-
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/analyzer-db?sslmode=disable
+    url: jdbc:postgresql://localhost:5432/analyzer?sslmode=disable
     username: postgres
     password: postgres
   jpa:
@@ -35,11 +32,6 @@ analyzer:
     fetch-max-wait-ms: 100
     enable-auto-commit: false
     consume-attempt-timeout: 100
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    instance-id: "${spring.application.name}:${random.value}"
 
 logging:
   level:

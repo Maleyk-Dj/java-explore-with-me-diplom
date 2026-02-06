@@ -4,7 +4,7 @@ services:
     image: postgres:16.1
     container_name: analyzer-db
     environment:
-      POSTGRES_DB: analyzer-db
+      POSTGRES_DB: analyzer
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
