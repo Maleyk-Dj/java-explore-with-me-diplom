@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/analyzer?sslmode=disable
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        format_sql: true
+        default_schema: public
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+analyzer:
+  kafka:
+    bootstrap-server: localhost:9092
+    key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+    event-deserializer: ru.practicum.analyzer.deserializer.EventSimilarityDeserializer
+    user-deserializer: ru.practicum.analyzer.deserializer.UserActionDeserializer
+    event-group-id: event-stats-client
+    user-group-id: user-stats-client
+    topic-events-similarity: stats.events-similarity.v1
+    topic-user-actions: stats.user-actions.v1
+    max-poll-records: 100
+    max-poll-intervalMs: 30000
+    fetch-max-wait-ms: 100
+    enable-auto-commit: false
+    consume-attempt-timeout: 100
+
+logging:
+  level:
+    ru.practicum.analyzer: DEBUG

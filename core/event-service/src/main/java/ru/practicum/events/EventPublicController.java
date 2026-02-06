@@ -25,17 +25,43 @@ public class EventPublicController {
     private final EventRepository eventRepository;
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEvent(@PathVariable Long eventId, HttpServletRequest request) throws ServiceUnavailableException {
-        return eventService.getPublicEventById(eventId, request);
+    public EventFullDto getEvent(
+            @PathVariable Long eventId,
+            @RequestHeader("X-EWM-USER-ID") long userId
+    ) throws ServiceUnavailableException {
+        return eventService.getPublicEventById(eventId, userId);
     }
+
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> searchEvents(
-            @ModelAttribute PublicEventParams params,
-            HttpServletRequest request) {
-        List<EventShortDto> events = eventService.searchPublicEvents(params, request);
-        return ResponseEntity.ok(events);
+            @ModelAttribute PublicEventParams params) {
+
+        return ResponseEntity.ok(
+                eventService.searchPublicEvents(params)
+        );
     }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<EventShortDto>> getRecommendations(
+            @RequestHeader("X-EWM-USER-ID") long userId,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                eventService.getRecommendations(userId, size)
+        );
+    }
+
+    @PutMapping("/{eventId}/like")
+    public ResponseEntity<Void> likeEvent(
+            @PathVariable Long eventId,
+            @RequestHeader("X-EWM-USER-ID") long userId) {
+
+        eventService.likeEvent(userId, eventId);
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }
 

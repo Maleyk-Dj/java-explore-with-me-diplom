@@ -81,5 +81,6 @@ public class Event {
     @FieldDescription(value = "Заголовок")
     private String title;
 
-    private Integer views = 0;
+    @Transient
+    private Double rating;
 }

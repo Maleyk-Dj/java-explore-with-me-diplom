@@ -1,14 +1,17 @@
 package ru.practicum.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.CollectorGrpcClient;
 import ru.practicum.dto.events.EventValidationDto;
 import ru.practicum.dto.events.enums.EventState;
 import ru.practicum.dto.requests.EventRequestStatusUpdateResult;
 import ru.practicum.dto.requests.RequestStatusUpdateRequest;
 import ru.practicum.dto.requests.ParticipationRequestDto;
 import ru.practicum.dto.requests.RequestStatus;
+import ru.practicum.grpc.stats.action.ActionTypeProto;
 import ru.practicum.request.client.EventClient;
 import ru.practicum.request.client.UserClient;
 import ru.practicum.request.count.ConfirmedCount;
@@ -19,9 +22,11 @@ import ru.practicum.request.mapper.RequestMapper;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.storage.RequestRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,6 +36,8 @@ public class RequestServiceImpl implements RequestService {
     private final RequestMapper requestMapper;
     private final UserClient userClient;
     private final EventClient eventClient;
+    private final CollectorGrpcClient collectorGrpcClient;
+
 
     @Override
     @Transactional
@@ -43,31 +50,27 @@ public class RequestServiceImpl implements RequestService {
         EventValidationDto event =
                 eventClient.getEventForValidation(eventId);
 
-        // 3️⃣ Дубликат
+        // 3️⃣ Проверки (как у тебя было)
         if (requestRepository.existsByRequesterIdAndEventId(userId, eventId)) {
             throw new ConflictException("Request already exists");
         }
 
-        // 4️⃣ Инициатор не может участвовать
         if (event.getInitiatorId().equals(userId)) {
             throw new ConflictException("Event initiator cannot request participation");
         }
 
-        // 5️⃣ Проверка публикации
         if (!EventState.PUBLISHED.name().equals(event.getState())) {
             throw new ConflictException("Cannot participate in unpublished event");
         }
 
         Integer confirmedCount = getConfirmedCountForEvent(eventId);
 
-        // 6️⃣ Проверка лимита
         if (event.getParticipantLimit() != null
                 && event.getParticipantLimit() != 0
                 && confirmedCount >= event.getParticipantLimit()) {
             throw new ConflictException("Participant limit reached");
         }
 
-        // 7️⃣ Авто-подтверждение
         boolean autoConfirm =
                 Boolean.FALSE.equals(event.getRequestModeration())
                         || event.getParticipantLimit() == 0;
@@ -81,9 +84,22 @@ public class RequestServiceImpl implements RequestService {
                         : RequestStatus.PENDING)
                 .build();
 
-        return requestMapper.toParticipationRequestDto(
-                requestRepository.save(request)
-        );
+        Request saved = requestRepository.save(request);
+
+        // 🔥 4️⃣ Отправляем ACTION_REGISTRATION в Collector
+        try {
+            collectorGrpcClient.collectUserAction(
+                    userId,
+                    eventId,
+                    ActionTypeProto.ACTION_REGISTER,
+                    Instant.now()
+            );
+        } catch (Exception e) {
+            // Регистрация не должна ломаться, если Collector упал
+            log.warn("Collector unavailable, REGISTRATION not recorded");
+        }
+
+        return requestMapper.toParticipationRequestDto(saved);
     }
 
 
@@ -231,5 +247,14 @@ public class RequestServiceImpl implements RequestService {
                 .build();
     }
 
+    @Override
+    public boolean hasUserVisitedEvent(Long userId, Long eventId) {
+
+        return requestRepository.existsByRequesterIdAndEventIdAndStatus(
+                userId,
+                eventId,
+                RequestStatus.CONFIRMED
+        );
+    }
 
 }

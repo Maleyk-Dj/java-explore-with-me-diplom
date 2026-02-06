@@ -28,4 +28,6 @@ public interface RequestService {
     EventRequestStatusUpdateResult changeRequestsStatus(
             Long eventId,
             RequestStatusUpdateRequest updateRequest);
+
+    boolean hasUserVisitedEvent(Long userId, Long eventId);
 }

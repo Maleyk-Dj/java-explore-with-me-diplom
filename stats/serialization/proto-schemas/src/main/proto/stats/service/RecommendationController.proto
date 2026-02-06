@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package stats.service.dashboard;
+
+import "stats/message/Recommendations.proto";
+
+option java_multiple_files = true;
+option java_package = "ru.practicum.grpc.stats.dashboard";
+
+service RecommendationsController {
+
+    // возвращает поток рекомендованных мероприятий для указанного пользователя
+    // выходные данные: поток сообщений RecommendedEventProto с предсказанной оценкой
+    rpc GetRecommendationsForUser(stats.messages.analyzer.UserPredictionsRequestProto) returns (stream stats.messages.analyzer.RecommendedEventProto);
+
+    // возвращает поток мероприятий, с которыми не взаимодействовал этот пользователь, но которые максимально похожи на указанное мероприятие
+    // выходные данные: поток сообщений RecommendedEventProto с коэффициентом подобия.
+    rpc GetSimilarEvents (stats.messages.analyzer.SimilarEventsRequestProto) returns (stream stats.messages.analyzer.RecommendedEventProto);
+
+    // получает идентификаторы мероприятий и возвращает их поток с суммой максимальных весов действий каждого пользователя с этими мероприятиями
+    // выходные данные: поток сообщений RecommendedEventProto с количеством взаимодействий
+    rpc GetInteractionsCount (stats.messages.analyzer.InteractionsCountRequestProto) returns (stream stats.messages.analyzer.RecommendedEventProto);
+}
