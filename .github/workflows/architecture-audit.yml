@@ -1,0 +1,38 @@
+name: Architecture Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect project structure
+        run: |
+          find . -type f \( -name "*.java" -o -name "*.yml" -o -name "pom.xml" \) > files.txt
+          xargs cat < files.txt > project_snapshot.txt
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --upgrade openai requests
+
+      - name: Run architecture audit
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: python .github/scripts/architecture_audit.py
