@@ -3,6 +3,8 @@ name: AI Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
 
 permissions:
   contents: read
@@ -19,10 +21,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build PR diff
+      - name: Build full project snapshot
         run: |
-          git fetch origin "${{ github.base_ref }}"
-          git diff "origin/${{ github.base_ref }}" > pr.diff
+          find . -name "*.java" -o -name "*.yml" -o -name "pom.xml" > files.txt
+          xargs cat < files.txt > pr.diff
 
       - name: Setup Python
         uses: actions/setup-python@v5
